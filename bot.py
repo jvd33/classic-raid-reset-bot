@@ -9,10 +9,10 @@ from discord.ext import commands
 from settings import BotSettings
 
 
-class StatefulBot(commands.Bot):
+class RaidResetBot(commands.Bot):
 
     def __init__(self, *args, **kwargs):
-        super(StatefulBot, self).__init__(*args, **kwargs)
+        super(RaidResetBot, self).__init__(*args, **kwargs)
         load_dotenv()
         self.token = os.getenv('TOKEN')
         self._register_commands()
@@ -22,6 +22,7 @@ class StatefulBot(commands.Bot):
             'heartbeat': self.heartbeat,
             'getReset': self.print_reset_date,
             'config': self.configure,
+            'calendar': self.display_calendar,
         }
 
         [self.command(name=name)(func) for name, func in registry.items()]
@@ -82,14 +83,15 @@ class StatefulBot(commands.Bot):
                 d[guild_id] = str(BotSettings.default())
             return d[guild_id]
 
+    async def display_calendar(self):
+        pass
+
     def _get_guild_settings(self, guild_id):
         with shelve.open('setting_state') as d:
             return d.get(guild_id, None)
 
 
-
 if __name__ == '__main__':
-    bot = StatefulBot(command_prefix='?')
-
+    bot = RaidResetBot(command_prefix='?')
 
     bot.run_stateful()

@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  bot:
+    build: .
+    depends_on:
+      - redis
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/guild_settings:/data
+    restart: always
