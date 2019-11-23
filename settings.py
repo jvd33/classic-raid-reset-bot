@@ -31,8 +31,8 @@ class BotSettings(object):
             - alert_double_reset: bool - Whether or not the mention in the reset notification that this week is a double reset week for the given raid_days.
                     - Default: True
     """
-    __slots__ = ['realm_region', 'realm_time_zone', 'notifications_enabled', 'notification_schedule', 'raids_enabled',
-                 'raid_days', 'alert_double_reset', '__dict__']
+    __slots__ = ['__dict__', 'realm_region', 'realm_time_zone', 'notifications_enabled', 'notification_schedule', 'raids_enabled',
+                 'raid_days', 'alert_double_reset']
 
     @staticmethod
     def default():
@@ -47,9 +47,27 @@ class BotSettings(object):
             'alert_double_reset': True
         }
         return BotSettings(**defaults)
+    
+    @property
+    def props(self):
+        return ['realm_region', 'realm_time_zone', 'raids_enabled', 'raid_days', 'alert_double_reset', 'notifications_enabled', 
+                'notification_schedule']
+    @staticmethod
+    def validate_str_input(setting: str, val: str):
+        val_arrays = {
+            'realm_region': lambda x: return x.lower() in ['us', 'eu'],
+            'realm_time_zone': lambda x: return x.lower() in ['est', 'cst', 'pst'],
+            'raids_enabled': lambda x: return x.lower() in [Raids.MoltenCore, Raids.Onyxia, Raids.ZulGurub, Raids.Naxxramas, Raids.AQForty, Raids.AQTwenty],
+            'raid_days': lambda x: return x.lower() in [Days.Monday, Days.Tuesday, Days.Wednesday, Days.Thursday, Days.Friday, Days.Saturday, Days.Sunday],
+            'alert_double_reset': lambda x: return x.lower() in ['true', 'false', 't', 'f', 'yes', 'no', 'y', 'n'],
+            'notifications_enabled': lambda x: return x.lower() in ['true', 'false', 't', 'f', 'yes', 'no', 'y', 'n'],
+            'notification_schedule': lambda x: return all([i.isdigit() for i in x.split(',')])
+        }
+        return True if val_arrays.get(setting, None) := func and func(val) else False
+
 
     def __str__(self):
-        return f"""
+        return f'
                 Realm Region: {self.realm_region}\n
                 Realm Time Zone: {self.realm_time_zone}\n
                 Notifications Enabled: {self.notifications_enabled}\n
@@ -57,4 +75,4 @@ class BotSettings(object):
                 Raids Enabled: {self.raids_enabled}\n
                 Raid Days: {self.raid_days}\n
                 Alert Double Resets?: {self.alert_double_reset}
-                """
+                '

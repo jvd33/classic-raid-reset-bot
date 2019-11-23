@@ -25,9 +25,8 @@ This is so we don't miss boss kills and everyone is aware of when each raid rese
             - `realm_region`: 
                 * Valid Values: `['EU', 'US']` 
                 * Default: `US`
-            - `realm_time_zone`: 
-                * Valid Values: `['EST', 'PST', 'CST', ...]` etc
-                * Default: `EST`
+            - `realm_time_zone`: The time zone your realm is hosted in to use when printing human readable reset times. 
+                * Valid Values: One of the standard TZ Database Names from [the standard tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
             - `notifications`: Automatically send messages to the channel printing the raid reset day/time for the configured raids
                 * Valid Values: `[True, False]`
                 * Default: True
