@@ -25,8 +25,9 @@ class RaidResetBot(commands.Bot):
         registry = {
             'heartbeat': self.heartbeat,
             'getReset': self.print_reset_date,
-            'config': self.configure,
+            'configure': self.configure,
             'calendar': self.display_calendar,
+            'get-config': self.get_config,
         }
 
         [self.command(name=name)(func) for name, func in registry.items()]
@@ -37,10 +38,13 @@ class RaidResetBot(commands.Bot):
 
     async def heartbeat(self, ctx):
         """
-        Responds with 'OK' and your current configuration settings if the bot is operational. No response indicates an error state.
+        Responds with 'OK' if the bot is functioning properly.
         """
+        await ctx.send(f'OK!')
+
+    async def get_config(self, ctx):
         guild_id = str(ctx.guild.id)
-        await ctx.send(f'OK: {self._get_guild_settings(guild_id)}')
+        await ctx.send(self.redis.get_guild_config(guild_id))
 
     async def print_reset_date(self, ctx, raid: str):
         """ 
@@ -86,15 +90,16 @@ class RaidResetBot(commands.Bot):
                     - Default: True
         """
         guild_id = str(ctx.guild.id)
-        if setting in BotSettings.props:
-            is_valid = BotSettings.validate_str_input(val)
-            if is_valid:
+        if setting in BotSettings.props():
+            if BotSettings.validate_str_input(setting, value):
                 settings = self.redis.get_guild_config(guild_id)
                 settings[setting] = value
-                self.redis.set_guild_config(settings)
-                ctx.send(f'Settings successfully updated, new Guild Settings: {settings}')
-            ctx.send(f'Invalid value for setting {setting}. See ?help for more information.')
-        ctx.send(f'Invalid setting name, valid setting names: {BotSettings.props}')
+                self.redis.set_guild_config(guild_id, settings)
+                await ctx.send(f'Settings successfully updated, new Guild Settings: {settings}')
+                return
+            await ctx.send(f'Invalid value for setting {setting}. See ?help for more information.')
+            return
+        await ctx.send(f'Invalid setting name, valid setting names: {BotSettings.props}')
 
 
     async def on_guild_join(self, guild):

@@ -39,40 +39,40 @@ class BotSettings(object):
 
         defaults = {
             'realm_region': 'US',
-            'realm_time_zone': 'EST',
+            'realm_time_zone': 'America/New York',
             'notifications_enabled': True,
             'notification_schedule': [0, 1, 3],
             'raids_enabled': [Raids.MoltenCore, Raids.Onyxia],
             'raid_days': [Days.Wednesday, Days.Thursday],
             'alert_double_reset': True
         }
-        return BotSettings(**defaults)
+        return defaults
     
-    @property
-    def props(self):
+    @staticmethod
+    def props():
         return ['realm_region', 'realm_time_zone', 'raids_enabled', 'raid_days', 'alert_double_reset', 'notifications_enabled', 
                 'notification_schedule']
+
     @staticmethod
     def validate_str_input(setting: str, val: str):
         val_arrays = {
-            'realm_region': lambda x: return x.lower() in ['us', 'eu'],
-            'realm_time_zone': lambda x: return x.lower() in ['est', 'cst', 'pst'],
-            'raids_enabled': lambda x: return x.lower() in [Raids.MoltenCore, Raids.Onyxia, Raids.ZulGurub, Raids.Naxxramas, Raids.AQForty, Raids.AQTwenty],
-            'raid_days': lambda x: return x.lower() in [Days.Monday, Days.Tuesday, Days.Wednesday, Days.Thursday, Days.Friday, Days.Saturday, Days.Sunday],
-            'alert_double_reset': lambda x: return x.lower() in ['true', 'false', 't', 'f', 'yes', 'no', 'y', 'n'],
-            'notifications_enabled': lambda x: return x.lower() in ['true', 'false', 't', 'f', 'yes', 'no', 'y', 'n'],
-            'notification_schedule': lambda x: return all([i.isdigit() for i in x.split(',')])
+            'realm_region': lambda x: x.lower() in ['us', 'eu'],
+            'realm_time_zone': lambda x: x.lower() in ['est', 'cst', 'pst'],
+            'raids_enabled': lambda x: x.lower() in [Raids.MoltenCore, Raids.Onyxia, Raids.ZulGurub, Raids.Naxxramas, Raids.AQForty, Raids.AQTwenty],
+            'raid_days': lambda x: x.lower() in [Days.Monday, Days.Tuesday, Days.Wednesday, Days.Thursday, Days.Friday, Days.Saturday, Days.Sunday],
+            'alert_double_reset': lambda x: x.lower() in ['true', 'false', 't', 'f', 'yes', 'no', 'y', 'n'],
+            'notifications_enabled': lambda x: x.lower() in ['true', 'false', 't', 'f', 'yes', 'no', 'y', 'n'],
+            'notification_schedule': lambda x: all([i.isdigit() for i in x.split(',')])
         }
-        return True if val_arrays.get(setting, None) := func and func(val) else False
+        return True if (func := val_arrays.get(setting, None)) and func(val) else False
 
 
-    def __str__(self):
-        return f'
-                Realm Region: {self.realm_region}\n
-                Realm Time Zone: {self.realm_time_zone}\n
-                Notifications Enabled: {self.notifications_enabled}\n
-                Notification Schedule: {self.notification_schedule}\n
-                Raids Enabled: {self.raids_enabled}\n
-                Raid Days: {self.raid_days}\n
-                Alert Double Resets?: {self.alert_double_reset}
-                '
+    def to_chat_msg(self):
+        return f'Realm Region: {self.realm_region}\n' + \
+                f'Realm Time Zone: {self.realm_time_zone}\n' + \
+                f'Notifications Enabled: {self.notifications_enabled}\n' + \
+                f'Notification Schedule: {self.notification_schedule}\n' + \
+                f'Raids Enabled: {self.raids_enabled}\n' + \
+                f'Raid Days: {self.raid_days}\n' + \
+                f'Alert Double Resets?: {self.alert_double_reset}'
+
